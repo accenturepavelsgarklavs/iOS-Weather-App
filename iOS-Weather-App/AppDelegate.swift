@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let weatherController = WeatherViewController()
         let navigationController = UINavigationController(rootViewController: weatherController)
         onOpenSearchController(controller: weatherController, navController: navigationController)
+        onOpenCurrentDetailsViewController(controller: weatherController, navController: navigationController)
         
         window?.rootViewController = navigationController
         
@@ -31,8 +32,16 @@ private extension AppDelegate {
     func onOpenSearchController(controller: WeatherViewController, navController: UINavigationController) {
         let searchController = SearchViewController()
         controller.weatherModel.onSearchTapped = { [weak self] in
-            guard let self = self else { return }
+            guard self == self else { return }
             navController.pushViewController(searchController, animated: true)
+        }
+    }
+
+    func onOpenCurrentDetailsViewController(controller: WeatherViewController, navController: UINavigationController) {
+        let currentDetailsViewController = CurrentDetailedWeatherViewController()
+        controller.weatherModel.onTableButton = { [weak self] in
+            guard self == self else { return }
+            navController.pushViewController(currentDetailsViewController, animated: true)
         }
     }
 }

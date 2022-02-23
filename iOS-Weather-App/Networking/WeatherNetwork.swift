@@ -24,7 +24,7 @@ class WeatherNetwork {
         let APIKey = "4926aab385c5e19245319d5e66954197"
 
         let replacedInput = (input as NSString).replacingOccurrences(of: " ", with: "+")
-        let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=\(replacedInput)&appid=\(APIKey)")!
+        let url = URL(string: "https://api.openweathermap.org/data/2.5/forecast?q=\(replacedInput)&appid=\(APIKey)")!
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -44,8 +44,6 @@ class WeatherNetwork {
                 }
                 return
             }
-
-
 
             guard (200...299).contains(httpResponse.statusCode) else {
                 DispatchQueue.main.async {

@@ -11,6 +11,7 @@ import Foundation
 
 final class WeatherViewControllerModel {
     var onSearchTapped: (() -> Void)?
+    var onTableButton: (() -> Void)?
 
     func celsius(_ kelvin: Double?) -> Double {
         round((kelvin ?? 0) - 273.15)
