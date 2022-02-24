@@ -11,16 +11,18 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var navigationController: UINavigationController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+        let weatherController = WeatherViewController()
+
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
-        
-        let weatherController = WeatherViewController()
-        let navigationController = UINavigationController(rootViewController: weatherController)
-        onOpenSearchController(controller: weatherController, navController: navigationController)
-        onOpenCurrentDetailsViewController(controller: weatherController, navController: navigationController)
+
+        navigationController = UINavigationController(rootViewController: weatherController)
+
+        makeOpenSearchVC(controller: weatherController)
+        makeOpenCurrentDetailsVC(controller: weatherController)
         
         window?.rootViewController = navigationController
         
@@ -29,19 +31,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 private extension AppDelegate {
-    func onOpenSearchController(controller: WeatherViewController, navController: UINavigationController) {
-        let searchController = SearchViewController()
-        controller.weatherModel.onSearchTapped = { [weak self] in
-            guard self == self else { return }
-            navController.pushViewController(searchController, animated: true)
+    func makeOpenSearchVC(controller: WeatherViewController) {
+        let searchController = controller.searchController
+        searchController.searchViewModel.onSearchTapped = { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.pushViewController(searchController, animated: true)
         }
     }
 
-    func onOpenCurrentDetailsViewController(controller: WeatherViewController, navController: UINavigationController) {
-        let currentDetailsViewController = CurrentDetailedWeatherViewController()
-        controller.weatherModel.onTableButton = { [weak self] in
-            guard self == self else { return }
-            navController.pushViewController(currentDetailsViewController, animated: true)
+    func makeOpenCurrentDetailsVC(controller: WeatherViewController) {
+        let currentDetailsController = controller.currentDetailsController
+        currentDetailsController.currentDetailedWeatherModel.onTableButton = { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.pushViewController(currentDetailsController, animated: true)
         }
     }
 }

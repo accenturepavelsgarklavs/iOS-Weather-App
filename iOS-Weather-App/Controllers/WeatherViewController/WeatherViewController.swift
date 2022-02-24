@@ -6,13 +6,9 @@
 //
 
 import UIKit
-//import MapKit
-//import CoreLocation
 import SnapKit
 
-final class WeatherViewController: UIViewController{
-
-//    private let locationManager = CLLocationManager()
+class WeatherViewController: UIViewController{
 
     private let cityNameLabel = UILabel()
     private let temperatureLabel = UILabel()
@@ -25,21 +21,11 @@ final class WeatherViewController: UIViewController{
     private let detailStackHumidityValueLabel = UILabel()
     private let detailStackVisibilityTitleLabel = UILabel()
     private let detailStackVisibilityValueLabel = UILabel()
-//    private let network = WeatherNetwork()
+    private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
     let weatherModel = WeatherViewControllerModel()
 
-//    private var currentLocationName: String?
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        getCurrentLocation{ [weak self] (success) -> Void in
-//            guard let self = self else { return }
-//            if success {
-//                guard let currentLocationName = self.currentLocationName else { return }
-//                self.setupNetwork(input: currentLocationName)
-//            }
-//        }
-    }
+    let searchController = SearchViewController()
+    let currentDetailsController = CurrentDetailedWeatherViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +39,14 @@ final class WeatherViewController: UIViewController{
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setupBackground()
+        if previousTraitCollection?.userInterfaceStyle == .dark {
+            backgroundImage.image = UIImage(named: "dayBackground")
+        }
+        else {
+            backgroundImage.image = UIImage(named: "nightBackground")
+        }
+        backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+        view.insertSubview(backgroundImage, at: 0)
     }
 
 }
@@ -62,27 +55,25 @@ private extension WeatherViewController {
     func setupNavigationBar() {
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationItem.title = "Current Weather"
+        navigationItem.title = "Weather"
         let searchButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchTapped))
         searchButton.tintColor = .white
         navigationItem.rightBarButtonItem = searchButton
     }
 
     @objc func searchTapped() {
-        weatherModel.onSearchTapped?()
+        searchController.searchViewModel.onSearchTapped?()
     }
 
     func setupBackground() {
-        UIGraphicsBeginImageContext(view.frame.size)
-        if traitCollection.userInterfaceStyle == .dark {
-            UIImage(named: "dayBackground")?.draw(in: view.bounds)
+        if traitCollection.userInterfaceStyle == .light {
+            backgroundImage.image = UIImage(named: "dayBackground")
         }
         else {
-            UIImage(named: "nightBackground")?.draw(in: view.bounds)
+            backgroundImage.image = UIImage(named: "nightBackground")
         }
-        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        view.backgroundColor = UIColor(patternImage: image)
+        backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+        view.insertSubview(backgroundImage, at: 0)
     }
 
     func setupCityNameLabel() {
@@ -147,35 +138,6 @@ private extension WeatherViewController {
         setupDetailStackHumidityLabel()
         setupDetailStackMaxTempLabel()
     }
-
-//    func setupNetwork(input: String) {
-//        network.getWeather(input: input) { [weak self] Weather, error in
-//            let weather = Weather?.list[0]
-//            guard let self = self, let windSpeed = weather?.wind.speed else { return }
-//            let currTemp = String(format: "%.0f", self.weatherModel.celsius(weather?.main.temp))
-//            let minTemp = String(format: "%.0f",  self.weatherModel.celsius(weather?.main.tempMin))
-//            let maxTemp = String(format: "%.0f", self.weatherModel.celsius(weather?.main.tempMax))
-//
-//            self.cityNameLabel.text = Weather?.city.name
-//            self.temperatureLabel.text = "\(currTemp)°"
-//            self.skyConditionLabel.text = weather?.weather[0].weatherDescription.rawValue
-//            self.detailStackWindLabel.text = "Wind \(String(windSpeed))m/s"
-//            self.detailStackMinTempLabel.text = "Min \(minTemp)°"
-//            self.detailStackMaxTempLabel.text = "Max \(maxTemp)°"
-//
-//            if error != nil {
-//                self.cityNameLabel.text = "Not Found"
-//                self.temperatureLabel.text = ""
-//                self.skyConditionLabel.text = ""
-//
-//                let alert = UIAlertController(title: "Error", message: "Something went wrong! Please try again!", preferredStyle: UIAlertController.Style.alert)
-//                alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default, handler: nil))
-//                self.present(alert, animated: true, completion: nil)
-//            }
-//
-//            self.view.setNeedsDisplay()
-//        }
-//    }
 
     func setupDetailStackWindLabel() {
         let windStack = UIStackView()
@@ -248,35 +210,6 @@ private extension WeatherViewController {
     }
 
     @objc func didTapTableButton() {
-        weatherModel.onTableButton?()
+        currentDetailsController.currentDetailedWeatherModel.onTableButton?()
     }
 }
-//
-//extension WeatherViewController: CLLocationManagerDelegate {
-//    func getCurrentLocation(finished: (_ success: Bool) -> Void) {
-//        locationManager.requestWhenInUseAuthorization()
-//
-//        if CLLocationManager.locationServicesEnabled() {
-//            locationManager.delegate = self
-//            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-//            locationManager.startUpdatingLocation()
-//        }
-//        finished(true)
-//    }
-//
-//    func fetchCityAndCountry(from location: CLLocation ,completion: @escaping (_ city: String?, _ country:  String?, _ error: Error?) -> ()) {
-//        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-//            completion(placemarks?.first?.locality,
-//                    placemarks?.first?.country,
-//                    error)
-//        }
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let location: CLLocation = manager.location else { return }
-//        fetchCityAndCountry(from: location) { [self] city, country, error in
-//            guard let city = city, error == nil else { return }
-//            currentLocationName = city
-//        }
-//    }
-//}

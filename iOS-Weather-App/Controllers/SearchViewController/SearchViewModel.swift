@@ -4,5 +4,6 @@
 
 import Foundation
 
-class SearchViewControllerModel {
+class SearchViewModel {
+    var onSearchTapped: (() -> Void)?
 }
