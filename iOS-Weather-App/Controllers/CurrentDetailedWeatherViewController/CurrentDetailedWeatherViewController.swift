@@ -8,8 +8,6 @@ class CurrentDetailedWeatherViewController: UIViewController {
 
     private let tableView = UITableView()
 
-    let currentDetailedWeatherModel = CurrentDetailedWeatherViewModel()
-
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()

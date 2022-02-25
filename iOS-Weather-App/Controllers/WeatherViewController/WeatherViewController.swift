@@ -24,8 +24,8 @@ class WeatherViewController: UIViewController{
     private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
     let weatherModel = WeatherViewControllerModel()
 
-    let searchController = SearchViewController()
-    let currentDetailsController = CurrentDetailedWeatherViewController()
+    var searchViewModel: SearchViewModel?
+    var currentDetailedWeatherModel: CurrentDetailedWeatherViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,15 +38,9 @@ class WeatherViewController: UIViewController{
         setupTableButton()
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        if previousTraitCollection?.userInterfaceStyle == .dark {
-            backgroundImage.image = UIImage(named: "dayBackground")
-        }
-        else {
-            backgroundImage.image = UIImage(named: "nightBackground")
-        }
-        backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
-        view.insertSubview(backgroundImage, at: 0)
+    func configure(searchViewModel: SearchViewModel, currentDetailedWeatherModel: CurrentDetailedWeatherViewModel) {
+        self.searchViewModel = searchViewModel
+        self.currentDetailedWeatherModel = currentDetailedWeatherModel
     }
 
 }
@@ -62,7 +56,7 @@ private extension WeatherViewController {
     }
 
     @objc func searchTapped() {
-        searchController.searchViewModel.onSearchTapped?()
+        searchViewModel?.onSearchTapped?()
     }
 
     func setupBackground() {
@@ -210,6 +204,6 @@ private extension WeatherViewController {
     }
 
     @objc func didTapTableButton() {
-        currentDetailsController.currentDetailedWeatherModel.onTableButton?()
+        currentDetailedWeatherModel?.onTableButton?()
     }
 }

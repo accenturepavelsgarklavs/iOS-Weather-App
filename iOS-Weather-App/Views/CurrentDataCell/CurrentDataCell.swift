@@ -32,10 +32,6 @@ class CurrentDataCell: UITableViewCell {
         setupWindLabel()
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
-
 }
 
 private extension CurrentDataCell {

@@ -14,7 +14,6 @@
 		1BE79CAA27C4D6EA00DED55C /* WeatherViewControllerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE79CA927C4D6EA00DED55C /* WeatherViewControllerModel.swift */; };
 		1BE79CAC27C4DB6D00DED55C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE79CAB27C4DB6D00DED55C /* SearchViewController.swift */; };
 		1BE79CAF27C77CBC00DED55C /* CurrentDataCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE79CAE27C77CBC00DED55C /* CurrentDataCell.swift */; };
-		1BE79CB227C77CDA00DED55C /* CurrentDataCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE79CB127C77CDA00DED55C /* CurrentDataCellModel.swift */; };
 		6067062C75A5CEA8B375D049 /* Pods_iOS_Weather_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14B3F22A5D7DFA2F100BE687 /* Pods_iOS_Weather_App.framework */; };
 		AFBCA187174789CC6D87A8C2 /* WeatherNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBCA2EF0A33F7F1C2EA0B0D /* WeatherNetwork.swift */; };
 		AFBCA24A736AB7BA1449A82A /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBCA1CE5BE848EBAAD4B357 /* SearchViewModel.swift */; };
@@ -36,7 +35,6 @@
 		1BE79CA927C4D6EA00DED55C /* WeatherViewControllerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewControllerModel.swift; sourceTree = "<group>"; };
 		1BE79CAB27C4DB6D00DED55C /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		1BE79CAE27C77CBC00DED55C /* CurrentDataCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDataCell.swift; sourceTree = "<group>"; };
-		1BE79CB127C77CDA00DED55C /* CurrentDataCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDataCellModel.swift; sourceTree = "<group>"; };
 		766C3EF252DD9117F89A40ED /* Pods-iOS-Weather-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-Weather-App.release.xcconfig"; path = "Target Support Files/Pods-iOS-Weather-App/Pods-iOS-Weather-App.release.xcconfig"; sourceTree = "<group>"; };
 		AFBCA1B9497D6FB0AF850B30 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file.ttf; path = "Roboto-Regular.ttf"; sourceTree = "<group>"; };
 		AFBCA1CE5BE848EBAAD4B357 /* SearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 			isa = PBXGroup;
 			children = (
 				1BE79CAE27C77CBC00DED55C /* CurrentDataCell.swift */,
-				1BE79CB127C77CDA00DED55C /* CurrentDataCellModel.swift */,
 			);
 			path = CurrentDataCell;
 			sourceTree = "<group>";
@@ -320,7 +317,6 @@
 				1BE79C9427C4D4A200DED55C /* AppDelegate.swift in Sources */,
 				AFBCA24A736AB7BA1449A82A /* SearchViewModel.swift in Sources */,
 				1BE79CAF27C77CBC00DED55C /* CurrentDataCell.swift in Sources */,
-				1BE79CB227C77CDA00DED55C /* CurrentDataCellModel.swift in Sources */,
 				AFBCA187174789CC6D87A8C2 /* WeatherNetwork.swift in Sources */,
 				AFBCA258FC16F79F6D5744AD /* Weather.swift in Sources */,
 				AFBCAEBB525C9317B137F5A8 /* CurrentDetailedWeatherViewController.swift in Sources */,
