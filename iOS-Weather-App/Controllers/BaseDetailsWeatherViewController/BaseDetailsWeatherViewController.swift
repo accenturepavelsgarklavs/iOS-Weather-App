@@ -4,19 +4,21 @@
 
 import UIKit
 
-class CurrentDetailedWeatherViewController: UIViewController {
+class BaseDetailsWeatherViewController: UIViewController {
 
     private let tableView = UITableView()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    func setupController() {
         setupTableView()
         setupNavigationBar()
     }
 
+    func setNavTitle(title: String) {
+        navigationItem.title = title
+    }
 }
 
-private extension CurrentDetailedWeatherViewController {
+private extension BaseDetailsWeatherViewController {
     func setupTableView() {
         view.addSubview(tableView)
         tableView.register(CurrentDataCell.self, forCellReuseIdentifier: CurrentDataCell.reuseIdentifier)
@@ -32,11 +34,10 @@ private extension CurrentDetailedWeatherViewController {
         navigationController?.navigationBar.tintColor = .purple
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.systemPurple]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationItem.title = "Rīga"
     }
 }
 
-extension CurrentDetailedWeatherViewController: UITableViewDataSource {
+extension BaseDetailsWeatherViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         10
     }
@@ -45,8 +46,4 @@ extension CurrentDetailedWeatherViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: CurrentDataCell.reuseIdentifier, for: indexPath)
         return cell
     }
-}
-
-extension CurrentDetailedWeatherViewController: UITableViewDelegate {
-
 }

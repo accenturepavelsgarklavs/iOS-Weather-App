@@ -4,6 +4,6 @@
 
 import Foundation
 
-class SearchViewModel {
-    var onSearchTapped: (() -> Void)?
+final class SearchViewModel {
+    var onLocationTapped: ((String?) -> Void)?
 }

@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class WeatherViewController: UIViewController{
+final class WeatherViewController: UIViewController{
 
     private let cityNameLabel = UILabel()
     private let temperatureLabel = UILabel()
@@ -22,10 +22,8 @@ class WeatherViewController: UIViewController{
     private let detailStackVisibilityTitleLabel = UILabel()
     private let detailStackVisibilityValueLabel = UILabel()
     private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
-    let weatherModel = WeatherViewControllerModel()
 
-    var searchViewModel: SearchViewModel?
-    var currentDetailedWeatherModel: CurrentDetailedWeatherViewModel?
+    private var weatherModel: WeatherViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,9 +36,8 @@ class WeatherViewController: UIViewController{
         setupTableButton()
     }
 
-    func configure(searchViewModel: SearchViewModel, currentDetailedWeatherModel: CurrentDetailedWeatherViewModel) {
-        self.searchViewModel = searchViewModel
-        self.currentDetailedWeatherModel = currentDetailedWeatherModel
+    func configure(weatherModel: WeatherViewModel) {
+        self.weatherModel = weatherModel
     }
 
 }
@@ -56,7 +53,7 @@ private extension WeatherViewController {
     }
 
     @objc func searchTapped() {
-        searchViewModel?.onSearchTapped?()
+        weatherModel?.onSearchTapped?()
     }
 
     func setupBackground() {
@@ -204,6 +201,6 @@ private extension WeatherViewController {
     }
 
     @objc func didTapTableButton() {
-        currentDetailedWeatherModel?.onTableButton?()
+        weatherModel?.onTableButton?()
     }
 }
