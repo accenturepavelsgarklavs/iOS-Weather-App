@@ -7,6 +7,11 @@ import UIKit
 class BaseDetailsWeatherViewController: UIViewController {
 
     private let tableView = UITableView()
+    private let networkManager = NetworkManager()
+    private let baseDetailsWeatherViewModel = BaseDetailsWeatherViewModel()
+
+    private var longitude: Double?
+    private var latitude: Double?
 
     func setupController() {
         setupTableView()
@@ -16,12 +21,17 @@ class BaseDetailsWeatherViewController: UIViewController {
     func setNavTitle(title: String) {
         navigationItem.title = title
     }
+
+    func setLocation(latitude: Double, longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
 }
 
 private extension BaseDetailsWeatherViewController {
     func setupTableView() {
         view.addSubview(tableView)
-        tableView.register(CurrentDataCell.self, forCellReuseIdentifier: CurrentDataCell.reuseIdentifier)
+        tableView.register(DetailsDataCell.self, forCellReuseIdentifier: DetailsDataCell.reuseIdentifier)
         tableView.dataSource = self
         tableView.separatorColor = .purple
 
@@ -39,11 +49,26 @@ private extension BaseDetailsWeatherViewController {
 
 extension BaseDetailsWeatherViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        8
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CurrentDataCell.reuseIdentifier, for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailsDataCell.reuseIdentifier, for: indexPath) as? DetailsDataCell,
+              let longitude = longitude,
+              let latitude = latitude else {
+            return .init()
+        }
+
+        networkManager.getWeather(longitude: longitude, latitude: latitude) { [weak self] Weather, error in
+            guard let self = self, let weather = Weather?.daily[indexPath.row] else { return }
+
+            cell.temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
+            cell.dateLabel.text = self.baseDetailsWeatherViewModel.convertToUsableDateString(dt: weather.dt)
+            cell.windLabel.attributedText = self.baseDetailsWeatherViewModel.makeWindLabelText(windSpeed: weather.windSpeed)
+            cell.maxTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.max))°"
+            cell.minTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.min))°"
+        }
+
         return cell
     }
 }

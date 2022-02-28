@@ -1,5 +1,5 @@
 //
-//  CurrentDataCell.swift
+//  DetailsDataCell.swift
 //  iOS-Weather-App
 //
 //  Created by pavels.garklavs on 24/02/2022.
@@ -7,16 +7,16 @@
 
 import UIKit
 
-class CurrentDataCell: UITableViewCell {
+class DetailsDataCell: UITableViewCell {
 
-    static let reuseIdentifier = "CurrentDataCell"
+    static let reuseIdentifier = "DetailsDataCell"
 
-    private let dateLabel = UILabel()
-    private let temperatureLabel = UILabel()
-    private let maxTemperatureLabel = UILabel()
-    private let minTemperatureLabel = UILabel()
-    private let minMaxSeparator = UILabel()
-    private let windLabel = UILabel()
+    let dateLabel = UILabel()
+    let temperatureLabel = UILabel()
+    let maxTemperatureLabel = UILabel()
+    let minTemperatureLabel = UILabel()
+    let minMaxSeparator = UILabel()
+    let windLabel = UILabel()
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -34,7 +34,7 @@ class CurrentDataCell: UITableViewCell {
 
 }
 
-private extension CurrentDataCell {
+private extension DetailsDataCell {
     func setupDateLabel() {
         contentView.addSubview(dateLabel)
         dateLabel.font = .systemFont(ofSize: 16)

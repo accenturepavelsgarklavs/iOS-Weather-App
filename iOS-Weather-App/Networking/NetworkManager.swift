@@ -10,9 +10,9 @@ enum NetworkerError: Error {
     case badData
 }
 
-class WeatherNetwork {
+class NetworkManager {
 
-    static let shared = WeatherNetwork()
+    static let shared = NetworkManager()
 
     private let session: URLSession
 
@@ -20,11 +20,10 @@ class WeatherNetwork {
         let config = URLSessionConfiguration.default
         session = URLSession(configuration: config)
     }
-    func getWeather(input: String, completion: @escaping (Weather?, Error?) -> Void) {
+    func getWeather(longitude: Double, latitude: Double, completion: @escaping (Weather?, Error?) -> Void) {
         let APIKey = "4926aab385c5e19245319d5e66954197"
 
-        let replacedInput = (input as NSString).replacingOccurrences(of: " ", with: "+")
-        let url = URL(string: "https://api.openweathermap.org/data/2.5/forecast?q=\(replacedInput)&appid=\(APIKey)")!
+        let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(latitude)&lon=\(longitude)&units=metric&appid=\(APIKey)")!
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

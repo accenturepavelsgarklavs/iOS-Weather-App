@@ -99,10 +99,15 @@ extension SearchViewController: UITableViewDelegate {
 
         let search = MKLocalSearch(request: searchRequest)
         search.start { [weak self] (response, error) in
-            guard let name = response?.mapItems[0].placemark.locality, let self = self else {
+            guard let location = response?.mapItems[0].placemark.location, let self = self else {
                 return
             }
-            self.searchViewModel?.onLocationTapped?(name)
+
+            let longitude = location.coordinate.longitude
+            let latitude = location.coordinate.latitude
+            let name = response?.mapItems[0].placemark.name
+
+            self.searchViewModel?.onLocationTapped?(longitude, latitude, name)
         }
     }
 }

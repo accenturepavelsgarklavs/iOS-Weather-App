@@ -6,82 +6,53 @@ import Foundation
 
 // MARK: - Weather
 struct Weather: Codable {
-    let cod: String
-    let message, cnt: Int
-    let list: [List]
-    let city: City
-}
-
-// MARK: - City
-struct City: Codable {
-    let id: Int
-    let name: String
-    let coord: Coord
-    let country: String
-    let population, timezone, sunrise, sunset: Int
-}
-
-// MARK: - Coord
-struct Coord: Codable {
     let lat, lon: Double
+    let timezone: String
+    let timezoneOffset: Int
+    let current: Current
+    let minutely: [Minutely]
+    let hourly: [Current]
+    let daily: [Daily]
+
+    enum CodingKeys: String, CodingKey {
+        case lat, lon, timezone
+        case timezoneOffset = "timezone_offset"
+        case current, minutely, hourly, daily
+    }
 }
 
-// MARK: - List
-struct List: Codable {
-    let dt: Int
-    let main: MainClass
+// MARK: - Current
+struct Current: Codable {
+    let dt: TimeInterval
+    let sunrise, sunset: Int?
+    let temp, feelsLike: Double
+    let pressure, humidity: Int
+    let dewPoint, uvi: Double
+    let clouds, visibility: Int
+    let windSpeed: Double
+    let windDeg: Int
     let weather: [WeatherElement]
-    let clouds: Clouds
-    let wind: Wind
-    let visibility: Int
-    let pop: Double
-    let sys: Sys
-    let dtTxt: String
+    let windGust: Double?
+    let pop: Int?
 
     enum CodingKeys: String, CodingKey {
-        case dt, main, weather, clouds, wind, visibility, pop, sys
-        case dtTxt = "dt_txt"
-    }
-}
-
-// MARK: - Clouds
-struct Clouds: Codable {
-    let all: Int
-}
-
-// MARK: - MainClass
-struct MainClass: Codable {
-    let temp, feelsLike, tempMin, tempMax: Double
-    let pressure, seaLevel, grndLevel, humidity: Int
-    let tempKf: Double
-
-    enum CodingKeys: String, CodingKey {
-        case temp
+        case dt, sunrise, sunset, temp
         case feelsLike = "feels_like"
-        case tempMin = "temp_min"
-        case tempMax = "temp_max"
-        case pressure
-        case seaLevel = "sea_level"
-        case grndLevel = "grnd_level"
-        case humidity
-        case tempKf = "temp_kf"
+        case pressure, humidity
+        case dewPoint = "dew_point"
+        case uvi, clouds, visibility
+        case windSpeed = "wind_speed"
+        case windDeg = "wind_deg"
+        case weather
+        case windGust = "wind_gust"
+        case pop
     }
-}
-
-// MARK: - Sys
-struct Sys: Codable {
-    let pod: Pod
-}
-
-enum Pod: String, Codable {
-    case d = "d"
-    case n = "n"
 }
 
 // MARK: - WeatherElement
 struct WeatherElement: Codable {
     let id: Int
-    let main: MainEnum
+    let main: Main
     let weatherDescription: Description
     let icon: String
 
@@ -92,7 +63,7 @@ struct WeatherElement: Codable {
     }
 }
 
-enum MainEnum: String, Codable {
+enum Main: String, Codable {
     case clear = "Clear"
     case clouds = "Clouds"
     case rain = "Rain"
@@ -111,7 +82,6 @@ enum MainEnum: String, Codable {
 }
 
 enum Description: String, Codable {
-
     // MARK: - Sky
     case clearSky = "clear sky"
 
@@ -180,12 +150,51 @@ enum Description: String, Codable {
     case ash = "volcanic ash"
     case squall = "squalls"
     case tornado = "tornado"
-
 }
 
-// MARK: - Wind
-struct Wind: Codable {
-    let speed: Double
-    let deg: Int
-    let gust: Double
+// MARK: - Daily
+struct Daily: Codable {
+    let dt: TimeInterval
+    let sunrise, sunset, moonrise: Int
+    let moonset: Int
+    let moonPhase: Double
+    let temp: Temp
+    let feelsLike: FeelsLike
+    let pressure, humidity: Int
+    let dewPoint, windSpeed: Double
+    let windDeg: Int
+    let windGust: Double
+    let weather: [WeatherElement]
+    let clouds: Int
+    let pop, uvi: Double
+    let rain: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case dt, sunrise, sunset, moonrise, moonset
+        case moonPhase = "moon_phase"
+        case temp
+        case feelsLike = "feels_like"
+        case pressure, humidity
+        case dewPoint = "dew_point"
+        case windSpeed = "wind_speed"
+        case windDeg = "wind_deg"
+        case windGust = "wind_gust"
+        case weather, clouds, pop, uvi, rain
+    }
+}
+
+// MARK: - FeelsLike
+struct FeelsLike: Codable {
+    let day, night, eve, morn: Double
+}
+
+// MARK: - Temp
+struct Temp: Codable {
+    let day, min, max, night: Double
+    let eve, morn: Double
+}
+
+// MARK: - Minutely
+struct Minutely: Codable {
+    let dt, precipitation: Int
 }

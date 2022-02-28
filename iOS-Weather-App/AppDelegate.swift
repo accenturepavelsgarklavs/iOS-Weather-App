@@ -59,9 +59,9 @@ private extension AppDelegate {
         let searchController = SearchViewController()
         let searchViewModel = SearchViewModel()
 
-        searchViewModel.onLocationTapped = { [weak self] name in
-            guard let self = self, let name = name else { return }
-            self.navigationController?.pushViewController(self.makeSearchedLocDetailsController(name: name), animated: true)
+        searchViewModel.onLocationTapped = { [weak self] longitude, latitude, name in
+            guard let self = self, let longitude = longitude, let latitude = latitude, let name = name else { return }
+            self.navigationController?.pushViewController(self.makeSearchedLocDetailsController(longitude: longitude, latitude: latitude, name: name), animated: true)
         }
 
         searchController.configure(searchViewModel: searchViewModel)
@@ -69,8 +69,8 @@ private extension AppDelegate {
         return searchController
     }
 
-    func makeSearchedLocDetailsController(name: String) -> SearchedDetailsViewController {
-        let searchedLocDetailsController = SearchedDetailsViewController(name: name)
+    func makeSearchedLocDetailsController(longitude: Double, latitude: Double, name: String) -> SearchedDetailsViewController {
+        let searchedLocDetailsController = SearchedDetailsViewController(longitude: longitude, latitude: latitude, name: name)
         let searchDetailsViewModel = SearchedDetailsViewModel()
 
         return searchedLocDetailsController
