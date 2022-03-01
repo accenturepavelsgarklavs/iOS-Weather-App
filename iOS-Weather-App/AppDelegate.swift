@@ -31,9 +31,9 @@ private extension AppDelegate {
         let weatherController = WeatherViewController()
         let weatherModel = WeatherViewModel()
         
-        weatherModel.onTableButton = { [weak self] in
-            guard let self = self else { return }
-            self.navigationController?.pushViewController(self.makeCurrentDetailsController(), animated: true)
+        weatherModel.onTableButton = { [weak self] longitude, latitude in
+            guard let self = self, let longitude = longitude, let latitude = latitude else { return }
+            self.navigationController?.pushViewController(self.makeCurrentDetailsController(longitude: longitude, latitude: latitude), animated: true)
         }
         
         weatherModel.onSearchTapped = { [weak self] in
@@ -46,8 +46,8 @@ private extension AppDelegate {
         return weatherController
     }
     
-    func makeCurrentDetailsController() -> UIViewController {
-        let currentDetailsController = CurrentLocDetailsViewController()
+    func makeCurrentDetailsController(longitude: Double, latitude: Double) -> UIViewController {
+        let currentDetailsController = CurrentLocDetailsViewController(longitude: longitude, latitude: latitude)
         let currentLocDetailsModel = CurrentLocDetailsViewModel()
 
         currentDetailsController.configure(currentLocDetailsViewModel: currentLocDetailsModel)

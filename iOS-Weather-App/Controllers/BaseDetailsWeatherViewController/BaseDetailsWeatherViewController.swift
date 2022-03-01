@@ -7,8 +7,9 @@ import UIKit
 class BaseDetailsWeatherViewController: UIViewController {
 
     private let tableView = UITableView()
-    private let networkManager = NetworkManager()
     private let baseDetailsWeatherViewModel = BaseDetailsWeatherViewModel()
+
+    private let networkManager = NetworkManager.shared
 
     private var longitude: Double?
     private var latitude: Double?
@@ -25,6 +26,7 @@ class BaseDetailsWeatherViewController: UIViewController {
     func setLocation(latitude: Double, longitude: Double) {
         self.latitude = latitude
         self.longitude = longitude
+        tableView.reloadData()
     }
 }
 
@@ -61,6 +63,8 @@ extension BaseDetailsWeatherViewController: UITableViewDataSource {
 
         networkManager.getWeather(longitude: longitude, latitude: latitude) { [weak self] Weather, error in
             guard let self = self, let weather = Weather?.daily[indexPath.row] else { return }
+
+            cell.selectionStyle = .none
 
             cell.temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
             cell.dateLabel.text = self.baseDetailsWeatherViewModel.convertToUsableDateString(dt: weather.dt)

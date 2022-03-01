@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import CoreLocation
 
 final class WeatherViewController: UIViewController{
 
@@ -23,10 +24,16 @@ final class WeatherViewController: UIViewController{
     private let detailStackVisibilityValueLabel = UILabel()
     private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
 
+    private var longitude: Double?
+    private var latitude: Double?
+
+    private let networkManager = NetworkManager.shared
+    private let locationManager = CLLocationManager()
     private var weatherModel: WeatherViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupLocationManager()
         setupBackground()
         setupNavigationBar()
         setupCityNameLabel()
@@ -72,7 +79,7 @@ private extension WeatherViewController {
         cityNameLabel.font = UIFont(name: "Roboto", size: 28)
         cityNameLabel.textColor = .white
 
-        cityNameLabel.text = "Rīga"
+        cityNameLabel.text = " "
 
         cityNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
@@ -85,7 +92,7 @@ private extension WeatherViewController {
         temperatureLabel.font = UIFont(name: "Roboto", size: 128)
         temperatureLabel.textColor = .white
 
-        temperatureLabel.text = "2°"
+        temperatureLabel.text = " "
 
         temperatureLabel.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
@@ -99,7 +106,7 @@ private extension WeatherViewController {
         skyConditionLabel.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
         skyConditionLabel.textColor = .white
 
-        skyConditionLabel.text = "clear sky"
+        skyConditionLabel.text = " "
 
         skyConditionLabel.snp.makeConstraints { make in
             make.trailing.equalTo(view.safeAreaLayoutGuide).offset(15)
@@ -144,7 +151,7 @@ private extension WeatherViewController {
         detailStackWindValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackWindTitleLabel.text = "Wind"
-        detailStackWindValueLabel.text = "3.86m/s"
+        detailStackWindValueLabel.text = " "
     }
 
     func setupDetailStackHumidityLabel() {
@@ -161,7 +168,7 @@ private extension WeatherViewController {
         detailStackHumidityValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackHumidityTitleLabel.text = "Humidity"
-        detailStackHumidityValueLabel.text = "48%"
+        detailStackHumidityValueLabel.text = " "
     }
 
     func setupDetailStackMaxTempLabel() {
@@ -178,7 +185,7 @@ private extension WeatherViewController {
         detailStackVisibilityValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackVisibilityTitleLabel.text = "Visibility"
-        detailStackVisibilityValueLabel.text = "4km"
+        detailStackVisibilityValueLabel.text = " "
     }
 
 
@@ -200,7 +207,50 @@ private extension WeatherViewController {
         tableButton.addTarget(self, action: #selector(didTapTableButton), for: .touchUpInside)
     }
 
+    func setupLocationManager() {
+        locationManager.requestAlwaysAuthorization()
+        locationManager.requestWhenInUseAuthorization()
+
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+    }
     @objc func didTapTableButton() {
-        weatherModel?.onTableButton?()
+        weatherModel?.onTableButton?(longitude, latitude)
+    }
+}
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
+        longitude = locValue.longitude
+        latitude = locValue.latitude
+
+        networkManager.getWeather(longitude: longitude ?? 0, latitude: latitude ?? 0) { [weak self] Weather, error in
+            guard let self = self, let weather = Weather?.current, let longitude = self.longitude, let latitude = self.latitude else { return }
+
+            let weatherVisibility = weather.visibility / 1000
+
+            self.temperatureLabel.text = "\(String(format: "%.0f", weather.temp))°"
+            self.skyConditionLabel.text = weather.weather[0].weatherDescription.rawValue
+            self.detailStackVisibilityValueLabel.text = "\(String(weatherVisibility))km"
+            self.detailStackHumidityValueLabel.text = "\(String(weather.humidity))%"
+            self.detailStackWindValueLabel.text = "\(String(weather.windSpeed))m/s"
+
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            location.fetchCityAndCountry { city, country, error in
+                guard let city = city, let country = country, error == nil else { return }
+                self.cityNameLabel.text = city
+            }
+        }
+
+    }
+}
+
+extension CLLocation {
+    func fetchCityAndCountry(completion: @escaping (_ city: String?, _ country:  String?, _ error: Error?) -> ()) {
+        CLGeocoder().reverseGeocodeLocation(self) { completion($0?.first?.locality, $0?.first?.country, $1) }
     }
 }

@@ -38,7 +38,7 @@ private extension DetailsDataCell {
     func setupDateLabel() {
         contentView.addSubview(dateLabel)
         dateLabel.font = .systemFont(ofSize: 16)
-        dateLabel.text = "Thu 24 Feb"
+        dateLabel.text = " "
 
         dateLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(15)
@@ -49,7 +49,7 @@ private extension DetailsDataCell {
     func setupTemperatureLabel() {
         contentView.addSubview(temperatureLabel)
         temperatureLabel.font = UIFont(name: "BebasNeue", size: 48)
-        temperatureLabel.text = "2°"
+        temperatureLabel.text = " "
 
         temperatureLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(15)
@@ -61,7 +61,7 @@ private extension DetailsDataCell {
     func setupMaxTemperatureLabel() {
         contentView.addSubview(maxTemperatureLabel)
         maxTemperatureLabel.font = UIFont(name: "BebasNeue", size: 24)
-        maxTemperatureLabel.text = "4°"
+        maxTemperatureLabel.text = " "
         maxTemperatureLabel.textColor = .red
 
         maxTemperatureLabel.snp.makeConstraints { make in
@@ -73,7 +73,7 @@ private extension DetailsDataCell {
     func setupMinTemperatureLabel() {
         contentView.addSubview(minTemperatureLabel)
         minTemperatureLabel.font = UIFont(name: "BebasNeue", size: 24)
-        minTemperatureLabel.text = "-1°"
+        minTemperatureLabel.text = " "
         minTemperatureLabel.textColor = .blue
 
         minTemperatureLabel.snp.makeConstraints { make in
@@ -100,7 +100,7 @@ private extension DetailsDataCell {
         imageAttachment.image = UIImage(systemName: "wind")
         let fullString = NSMutableAttributedString(string: " ")
         fullString.append(NSAttributedString(attachment: imageAttachment))
-        fullString.append(NSAttributedString(string: " 3.86m/s"))
+        fullString.append(NSAttributedString(string: " "))
         windLabel.attributedText = fullString
 
         windLabel.font = windLabel.font.withSize(18)
