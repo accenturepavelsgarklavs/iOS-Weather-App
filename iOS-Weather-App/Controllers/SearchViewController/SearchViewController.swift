@@ -102,12 +102,9 @@ extension SearchViewController: UITableViewDelegate {
             guard let location = response?.mapItems[0].placemark.location, let self = self else {
                 return
             }
-
-            let longitude = location.coordinate.longitude
-            let latitude = location.coordinate.latitude
             let name = response?.mapItems[0].placemark.name
 
-            self.searchViewModel?.onLocationTapped?(longitude, latitude, name)
+            self.searchViewModel?.onLocationTapped?(location, name)
         }
     }
 }
@@ -119,8 +116,6 @@ extension SearchViewController: MKLocalSearchCompleterDelegate {
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        let alert = UIAlertController(title: "Error", message: "Something went wrong! Please try again!", preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        AlertPopUp.makePopUp(controller: self, error: error)
     }
 }

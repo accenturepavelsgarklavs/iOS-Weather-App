@@ -11,7 +11,7 @@ import CoreLocation
 
 final class WeatherViewController: UIViewController{
 
-    private let cityNameLabel = UILabel()
+    private let locationNameLabel = UILabel()
     private let temperatureLabel = UILabel()
     private let skyConditionLabel = UILabel()
     private let tableButton = UIButton()
@@ -24,10 +24,8 @@ final class WeatherViewController: UIViewController{
     private let detailStackVisibilityValueLabel = UILabel()
     private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
 
-    private var longitude: Double?
-    private var latitude: Double?
+    private var location: CLLocation?
 
-    private let networkManager = NetworkManager.shared
     private let locationManager = CLLocationManager()
     private var weatherModel: WeatherViewModel?
 
@@ -75,13 +73,11 @@ private extension WeatherViewController {
     }
 
     func setupCityNameLabel() {
-        view.addSubview(cityNameLabel)
-        cityNameLabel.font = UIFont(name: "Roboto", size: 28)
-        cityNameLabel.textColor = .white
+        view.addSubview(locationNameLabel)
+        locationNameLabel.font = UIFont(name: "Roboto", size: 28)
+        locationNameLabel.textColor = .white
 
-        cityNameLabel.text = " "
-
-        cityNameLabel.snp.makeConstraints { make in
+        locationNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.top.equalTo(view).offset(120)
         }
@@ -92,11 +88,9 @@ private extension WeatherViewController {
         temperatureLabel.font = UIFont(name: "Roboto", size: 128)
         temperatureLabel.textColor = .white
 
-        temperatureLabel.text = " "
-
         temperatureLabel.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
-            make.top.equalTo(cityNameLabel.snp.bottom)
+            make.top.equalTo(locationNameLabel.snp.bottom)
         }
     }
 
@@ -106,10 +100,8 @@ private extension WeatherViewController {
         skyConditionLabel.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
         skyConditionLabel.textColor = .white
 
-        skyConditionLabel.text = " "
-
         skyConditionLabel.snp.makeConstraints { make in
-            make.trailing.equalTo(view.safeAreaLayoutGuide).offset(15)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(5)
             make.top.equalTo(view.snp.centerY).offset(60)
         }
     }
@@ -151,7 +143,6 @@ private extension WeatherViewController {
         detailStackWindValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackWindTitleLabel.text = "Wind"
-        detailStackWindValueLabel.text = " "
     }
 
     func setupDetailStackHumidityLabel() {
@@ -168,7 +159,6 @@ private extension WeatherViewController {
         detailStackHumidityValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackHumidityTitleLabel.text = "Humidity"
-        detailStackHumidityValueLabel.text = " "
     }
 
     func setupDetailStackMaxTempLabel() {
@@ -185,7 +175,6 @@ private extension WeatherViewController {
         detailStackVisibilityValueLabel.font = UIFont(name: "BebasNeue", size: 26)
 
         detailStackVisibilityTitleLabel.text = "Visibility"
-        detailStackVisibilityValueLabel.text = " "
     }
 
 
@@ -218,39 +207,39 @@ private extension WeatherViewController {
         }
     }
     @objc func didTapTableButton() {
-        weatherModel?.onTableButton?(longitude, latitude)
+        weatherModel?.onTableButton?(location)
     }
 }
 
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
-        longitude = locValue.longitude
-        latitude = locValue.latitude
+        location = manager.location
 
-        networkManager.getWeather(longitude: longitude ?? 0, latitude: latitude ?? 0) { [weak self] Weather, error in
-            guard let self = self, let weather = Weather?.current, let longitude = self.longitude, let latitude = self.latitude else { return }
+        NetworkManager.getWeather(location: location) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self, let location = self.location else { return }
+                if case .success(let weather) = result {
+                    let weather = weather.current
 
-            let weatherVisibility = weather.visibility / 1000
+                    let weatherVisibility = Double(weather.visibility) / 1000
 
-            self.temperatureLabel.text = "\(String(format: "%.0f", weather.temp))°"
-            self.skyConditionLabel.text = weather.weather[0].weatherDescription.rawValue
-            self.detailStackVisibilityValueLabel.text = "\(String(weatherVisibility))km"
-            self.detailStackHumidityValueLabel.text = "\(String(weather.humidity))%"
-            self.detailStackWindValueLabel.text = "\(String(weather.windSpeed))m/s"
+                    self.temperatureLabel.text = "\(String(format: "%.0f", weather.temp))°"
+                    self.skyConditionLabel.text = weather.weather[0].weatherDescription
+                    self.detailStackVisibilityValueLabel.text = "\(String(format: "%.1f", weatherVisibility))km"
+                    self.detailStackHumidityValueLabel.text = "\(String(weather.humidity))%"
+                    self.detailStackWindValueLabel.text = "\(String(weather.windSpeed))m/s"
 
-            let location = CLLocation(latitude: latitude, longitude: longitude)
-            location.fetchCityAndCountry { city, country, error in
-                guard let city = city, let country = country, error == nil else { return }
-                self.cityNameLabel.text = city
+                    location.fetchCityAndCountry { city, country, error in
+                        guard let city = city, let _ = country, let error = error else { return }
+                        self.locationNameLabel.text = city
+                        AlertPopUp.makePopUp(controller: self, error: error)
+                    }
+                } else if case .failure(let error) = result {
+                    AlertPopUp.makePopUp(controller: self, error: error)
+                }
             }
+            
         }
 
-    }
-}
-
-extension CLLocation {
-    func fetchCityAndCountry(completion: @escaping (_ city: String?, _ country:  String?, _ error: Error?) -> ()) {
-        CLGeocoder().reverseGeocodeLocation(self) { completion($0?.first?.locality, $0?.first?.country, $1) }
     }
 }

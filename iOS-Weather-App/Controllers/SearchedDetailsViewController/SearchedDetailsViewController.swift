@@ -3,28 +3,20 @@
 //
 
 import Foundation
+import CoreLocation
 
 final class SearchedDetailsViewController: BaseDetailsWeatherViewController {
 
-    private var longitude: Double?
-    private var latitude: Double?
-    private var name: String?
-
-    required init(coder: NSCoder) {
-        super.init(coder: coder)!
-    }
-
-    required init(longitude: Double, latitude: Double, name: String) {
-        super.init(nibName: nil, bundle: nil)
-        self.longitude = longitude
-        self.latitude = latitude
-        self.name = name
-    }
+    private var searchDetailsViewModel: SearchedDetailsViewModel?
 
     override func viewDidLoad() {
-        setLocation(latitude: latitude ?? 0, longitude: longitude ?? 0)
+        setLocation(location: searchDetailsViewModel?.location)
         setupController()
-        setNavTitle(title: name ?? "")
+        setNavTitle(title: searchDetailsViewModel?.name)
+    }
+
+    func configure(searchDetailsViewModel: SearchedDetailsViewModel) {
+        self.searchDetailsViewModel = searchDetailsViewModel
     }
 
 }

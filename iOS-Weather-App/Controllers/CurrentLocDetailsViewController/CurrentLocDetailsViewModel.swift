@@ -6,4 +6,9 @@ import Foundation
 import CoreLocation
 
 final class CurrentLocDetailsViewModel {
+    var location: CLLocation?
+
+    init(location: CLLocation) {
+        self.location = location
+    }
 }

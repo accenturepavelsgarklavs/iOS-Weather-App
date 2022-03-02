@@ -3,27 +3,36 @@
 //
 
 import Foundation
+import CoreLocation
 
-enum NetworkerError: Error {
+enum NetworkError: Error {
+    case badURL
     case badResponse
     case badStatusCode(Int)
     case badData
 }
 
-class NetworkManager {
+enum LocationError: Error {
+    case badLocation
+}
 
-    static let shared = NetworkManager()
+struct NetworkManager {
+    static func getWeather(location: CLLocation? , completion: @escaping (Result<Weather, Error>) -> Void) {
 
-    private let session: URLSession
+        guard let location = location else {
+            completion(.failure(LocationError.badLocation))
+            return
+        }
 
-    init() {
+        let url = ApiURL.makeApiURL(location: location, units: "metric")
+
+        guard let url = url else {
+            completion(.failure(NetworkError.badURL))
+            return
+        }
+
         let config = URLSessionConfiguration.default
-        session = URLSession(configuration: config)
-    }
-    func getWeather(longitude: Double, latitude: Double, completion: @escaping (Weather?, Error?) -> Void) {
-        let APIKey = "4926aab385c5e19245319d5e66954197"
-
-        let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(latitude)&lon=\(longitude)&units=metric&appid=\(APIKey)")!
+        let session = URLSession(configuration: config)
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -31,42 +40,30 @@ class NetworkManager {
         let task = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
 
             if let error = error {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
+                    completion(.failure(error))
                 return
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    completion(nil, NetworkerError.badResponse)
-                }
+                    completion(.failure(NetworkError.badResponse))
                 return
             }
 
             guard (200...299).contains(httpResponse.statusCode) else {
-                DispatchQueue.main.async {
-                    completion(nil, NetworkerError.badStatusCode(httpResponse.statusCode))
-                }
+                    completion(.failure(NetworkError.badStatusCode(httpResponse.statusCode)))
                 return
             }
 
             guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(nil, NetworkerError.badData)
-                }
+                    completion(.failure(NetworkError.badData))
                 return
             }
 
             do {
                 let weather = try JSONDecoder().decode(Weather.self, from: data)
-                DispatchQueue.main.async {
-                    completion(weather, nil)
-                }
+                    completion(.success(weather))
             } catch let error {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
+                    completion(.failure(error))
             }
         }
         task.resume()

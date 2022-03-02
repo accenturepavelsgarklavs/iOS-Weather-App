@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -29,26 +30,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 private extension AppDelegate {
     func makeWeatherController() -> UIViewController {
         let weatherController = WeatherViewController()
-        let weatherModel = WeatherViewModel()
-        
-        weatherModel.onTableButton = { [weak self] longitude, latitude in
-            guard let self = self, let longitude = longitude, let latitude = latitude else { return }
-            self.navigationController?.pushViewController(self.makeCurrentDetailsController(longitude: longitude, latitude: latitude), animated: true)
-        }
-        
-        weatherModel.onSearchTapped = { [weak self] in
-            guard let self = self else { return }
-            self.navigationController?.pushViewController(self.makeSearchController(), animated: true)
-        }
-        
-        weatherController.configure(weatherModel: weatherModel)
+        let weatherViewModel = WeatherViewModel()
+
+        pushCurrentDetailsController(viewModel: weatherViewModel)
+        pushSearchController(viewModel: weatherViewModel)
+
+        weatherController.configure(weatherModel: weatherViewModel)
         
         return weatherController
     }
     
-    func makeCurrentDetailsController(longitude: Double, latitude: Double) -> UIViewController {
-        let currentDetailsController = CurrentLocDetailsViewController(longitude: longitude, latitude: latitude)
-        let currentLocDetailsModel = CurrentLocDetailsViewModel()
+    func makeCurrentDetailsController(location: CLLocation) -> UIViewController {
+        let currentDetailsController = CurrentLocDetailsViewController()
+        let currentLocDetailsModel = CurrentLocDetailsViewModel(location: location)
 
         currentDetailsController.configure(currentLocDetailsViewModel: currentLocDetailsModel)
 
@@ -59,9 +53,9 @@ private extension AppDelegate {
         let searchController = SearchViewController()
         let searchViewModel = SearchViewModel()
 
-        searchViewModel.onLocationTapped = { [weak self] longitude, latitude, name in
-            guard let self = self, let longitude = longitude, let latitude = latitude, let name = name else { return }
-            self.navigationController?.pushViewController(self.makeSearchedLocDetailsController(longitude: longitude, latitude: latitude, name: name), animated: true)
+        searchViewModel.onLocationTapped = { [weak self] location, name in
+            guard let self = self, let location = location, let name = name else { return }
+            self.navigationController?.pushViewController(self.makeSearchedLocDetailsController(location: location, name: name), animated: true)
         }
 
         searchController.configure(searchViewModel: searchViewModel)
@@ -69,10 +63,26 @@ private extension AppDelegate {
         return searchController
     }
 
-    func makeSearchedLocDetailsController(longitude: Double, latitude: Double, name: String) -> SearchedDetailsViewController {
-        let searchedLocDetailsController = SearchedDetailsViewController(longitude: longitude, latitude: latitude, name: name)
-        let searchDetailsViewModel = SearchedDetailsViewModel()
+    func makeSearchedLocDetailsController(location: CLLocation, name: String) -> SearchedDetailsViewController {
+        let searchedLocDetailsController = SearchedDetailsViewController()
+        let searchDetailsViewModel = SearchedDetailsViewModel(location: location, name: name)
+
+        searchedLocDetailsController.configure(searchDetailsViewModel: searchDetailsViewModel)
 
         return searchedLocDetailsController
+    }
+
+    func pushCurrentDetailsController(viewModel: WeatherViewModel) {
+        viewModel.onTableButton = { [weak self] location in
+            guard let self = self, let location = location else { return }
+            self.navigationController?.pushViewController(self.makeCurrentDetailsController(location: location), animated: true)
+        }
+    }
+
+    func pushSearchController(viewModel: WeatherViewModel) {
+        viewModel.onSearchTapped = { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.pushViewController(self.makeSearchController(), animated: true)
+        }
     }
 }

@@ -48,7 +48,7 @@ private extension DetailsDataCell {
 
     func setupTemperatureLabel() {
         contentView.addSubview(temperatureLabel)
-        temperatureLabel.font = UIFont(name: "BebasNeue", size: 48)
+        temperatureLabel.font = Constants.cellTempFont
         temperatureLabel.text = " "
 
         temperatureLabel.snp.makeConstraints { make in
@@ -60,7 +60,7 @@ private extension DetailsDataCell {
 
     func setupMaxTemperatureLabel() {
         contentView.addSubview(maxTemperatureLabel)
-        maxTemperatureLabel.font = UIFont(name: "BebasNeue", size: 24)
+        maxTemperatureLabel.font = Constants.cellMinMaxFont
         maxTemperatureLabel.text = " "
         maxTemperatureLabel.textColor = .red
 
@@ -72,7 +72,7 @@ private extension DetailsDataCell {
 
     func setupMinTemperatureLabel() {
         contentView.addSubview(minTemperatureLabel)
-        minTemperatureLabel.font = UIFont(name: "BebasNeue", size: 24)
+        minTemperatureLabel.font = Constants.cellMinMaxFont
         minTemperatureLabel.text = " "
         minTemperatureLabel.textColor = .blue
 
@@ -84,7 +84,7 @@ private extension DetailsDataCell {
 
     func setupMinMaxSeparator() {
         contentView.addSubview(minMaxSeparator)
-        minMaxSeparator.font = UIFont(name: "BebasNeue", size: 24)
+        minMaxSeparator.font = Constants.cellMinMaxFont
         minMaxSeparator.text = "/"
 
         minMaxSeparator.snp.makeConstraints { make in

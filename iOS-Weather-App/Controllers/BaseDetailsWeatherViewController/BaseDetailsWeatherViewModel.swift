@@ -3,18 +3,9 @@
 //
 
 import UIKit
+import CoreLocation
 
 class BaseDetailsWeatherViewModel {
-    func convertToUsableDateString(dt: TimeInterval) -> String {
-        let date = Date(timeIntervalSince1970: dt)
-        let dateformatter = DateFormatter()
-
-        dateformatter.dateFormat = "EEEE, MMM d"
-        let dateString = dateformatter.string(from: date)
-
-        return dateString
-    }
-
     func makeWindLabelText(windSpeed: Double) -> NSMutableAttributedString {
         let imageAttachment = NSTextAttachment()
         imageAttachment.image = UIImage(systemName: "wind")

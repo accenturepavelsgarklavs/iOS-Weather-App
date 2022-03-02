@@ -3,7 +3,8 @@
 //
 
 import Foundation
+import CoreLocation
 
 final class SearchViewModel {
-    var onLocationTapped: ((Double?, Double?, String?) -> Void)?
+    var onLocationTapped: ((CLLocation?, String?) -> Void)?
 }

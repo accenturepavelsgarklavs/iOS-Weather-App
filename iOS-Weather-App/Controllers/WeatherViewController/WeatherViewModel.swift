@@ -10,6 +10,6 @@ import CoreLocation
 import Foundation
 
 final class WeatherViewModel {
-    var onTableButton: ((Double?, Double?) -> Void)?
+    var onTableButton: ((CLLocation?) -> Void)?
     var onSearchTapped: (() -> Void)?
 }

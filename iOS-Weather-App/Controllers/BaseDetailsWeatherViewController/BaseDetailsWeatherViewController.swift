@@ -3,29 +3,30 @@
 //
 
 import UIKit
+import CoreLocation
 
 class BaseDetailsWeatherViewController: UIViewController {
 
     private let tableView = UITableView()
     private let baseDetailsWeatherViewModel = BaseDetailsWeatherViewModel()
 
-    private let networkManager = NetworkManager.shared
+    private var location: CLLocation?
 
-    private var longitude: Double?
-    private var latitude: Double?
+    override func viewDidLoad() {
+        setupController()
+    }
 
     func setupController() {
         setupTableView()
         setupNavigationBar()
     }
 
-    func setNavTitle(title: String) {
+    func setNavTitle(title: String?) {
         navigationItem.title = title
     }
 
-    func setLocation(latitude: Double, longitude: Double) {
-        self.latitude = latitude
-        self.longitude = longitude
+    func setLocation(location: CLLocation?) {
+        self.location = location
         tableView.reloadData()
     }
 }
@@ -44,7 +45,7 @@ private extension BaseDetailsWeatherViewController {
 
     func setupNavigationBar() {
         navigationController?.navigationBar.tintColor = .purple
-        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.systemPurple]
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemPurple]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
     }
 }
@@ -56,23 +57,26 @@ extension BaseDetailsWeatherViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailsDataCell.reuseIdentifier, for: indexPath) as? DetailsDataCell,
-              let longitude = longitude,
-              let latitude = latitude else {
+              let location = location else {
             return .init()
         }
 
-        networkManager.getWeather(longitude: longitude, latitude: latitude) { [weak self] Weather, error in
-            guard let self = self, let weather = Weather?.daily[indexPath.row] else { return }
-
-            cell.selectionStyle = .none
-
-            cell.temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
-            cell.dateLabel.text = self.baseDetailsWeatherViewModel.convertToUsableDateString(dt: weather.dt)
-            cell.windLabel.attributedText = self.baseDetailsWeatherViewModel.makeWindLabelText(windSpeed: weather.windSpeed)
-            cell.maxTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.max))°"
-            cell.minTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.min))°"
+        NetworkManager.getWeather(location: location) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if case .success(let weather) = result {
+                    let weather = weather.daily[indexPath.row]
+                    cell.selectionStyle = .none
+                    cell.temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
+                    cell.dateLabel.text = weather.dt.convertToUsableDateString()
+                    cell.windLabel.attributedText = self.baseDetailsWeatherViewModel.makeWindLabelText(windSpeed: weather.windSpeed)
+                    cell.maxTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.max))°"
+                    cell.minTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.min))°"
+                } else if case .failure(let error) = result {
+                    AlertPopUp.makePopUp(controller: self, error: error)
+                }
+            }
         }
-
         return cell
     }
 }
