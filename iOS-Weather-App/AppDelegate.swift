@@ -6,31 +6,80 @@
 //
 
 import UIKit
+import CoreLocation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    var window: UIWindow?
+    private var navigationController: UINavigationController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.makeKeyAndVisible()
+
+        navigationController = UINavigationController(rootViewController: makeWeatherController())
+        
+        window?.rootViewController = navigationController
+        
         return true
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
 }
 
+private extension AppDelegate {
+    func makeWeatherController() -> UIViewController {
+        let weatherController = WeatherViewController()
+        let weatherViewModel = WeatherViewModel()
+
+        weatherViewModel.onTableButton = { [weak self] location in
+            guard let self = self, let location = location else { return }
+            self.navigationController?.pushViewController(self.makeCurrentDetailsController(location: location), animated: true)
+        }
+
+        weatherViewModel.onSearchTapped = { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.pushViewController(self.makeSearchController(), animated: true)
+        }
+
+        weatherController.configure(weatherModel: weatherViewModel)
+        
+        return weatherController
+    }
+    
+    func makeCurrentDetailsController(location: CLLocation) -> UIViewController {
+        let currentDetailsController = CurrentLocDetailsViewController()
+        let currentLocDetailsModel = CurrentLocDetailsViewModel(location: location)
+
+        currentDetailsController.configure(currentLocDetailsViewModel: currentLocDetailsModel)
+
+        return currentDetailsController
+    }
+
+    func makeSearchController() -> UIViewController {
+        let searchController = SearchViewController()
+        let searchViewModel = SearchViewModel()
+
+        searchViewModel.onLocationTapped = { [weak self] location, name in
+            guard let self = self, let location = location, let name = name else { return }
+            self.navigationController?.pushViewController(self.makeSearchedLocDetailsController(location: location, name: name), animated: true)
+        }
+
+        searchController.configure(searchViewModel: searchViewModel)
+
+        return searchController
+    }
+
+    func makeSearchedLocDetailsController(location: CLLocation, name: String) -> SearchedDetailsViewController {
+        let searchedLocDetailsController = SearchedDetailsViewController()
+        let searchDetailsViewModel = SearchedDetailsViewModel(location: location, name: name)
+
+        searchedLocDetailsController.configure(searchDetailsViewModel: searchDetailsViewModel)
+
+        return searchedLocDetailsController
+    }
+
+    func pushSearchController(viewModel: WeatherViewModel) {
+
+    }
+}
