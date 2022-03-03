@@ -32,8 +32,15 @@ private extension AppDelegate {
         let weatherController = WeatherViewController()
         let weatherViewModel = WeatherViewModel()
 
-        pushCurrentDetailsController(viewModel: weatherViewModel)
-        pushSearchController(viewModel: weatherViewModel)
+        weatherViewModel.onTableButton = { [weak self] location in
+            guard let self = self, let location = location else { return }
+            self.navigationController?.pushViewController(self.makeCurrentDetailsController(location: location), animated: true)
+        }
+
+        weatherViewModel.onSearchTapped = { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.pushViewController(self.makeSearchController(), animated: true)
+        }
 
         weatherController.configure(weatherModel: weatherViewModel)
         
@@ -72,17 +79,7 @@ private extension AppDelegate {
         return searchedLocDetailsController
     }
 
-    func pushCurrentDetailsController(viewModel: WeatherViewModel) {
-        viewModel.onTableButton = { [weak self] location in
-            guard let self = self, let location = location else { return }
-            self.navigationController?.pushViewController(self.makeCurrentDetailsController(location: location), animated: true)
-        }
-    }
-
     func pushSearchController(viewModel: WeatherViewModel) {
-        viewModel.onSearchTapped = { [weak self] in
-            guard let self = self else { return }
-            self.navigationController?.pushViewController(self.makeSearchController(), animated: true)
-        }
+
     }
 }

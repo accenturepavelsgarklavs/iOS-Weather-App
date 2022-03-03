@@ -116,6 +116,6 @@ extension SearchViewController: MKLocalSearchCompleterDelegate {
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        AlertPopUp.makePopUp(controller: self, error: error)
+        showAlert(title: "Error", message: error.localizedDescription)
     }
 }

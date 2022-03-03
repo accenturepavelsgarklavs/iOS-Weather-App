@@ -7,16 +7,16 @@ import CoreLocation
 
 final class SearchedDetailsViewController: BaseDetailsWeatherViewController {
 
-    private var searchDetailsViewModel: SearchedDetailsViewModel?
+    private var viewModel: SearchedDetailsViewModel?
 
     override func viewDidLoad() {
-        setLocation(location: searchDetailsViewModel?.location)
+        setLocation(location: viewModel?.location)
         setupController()
-        setNavTitle(title: searchDetailsViewModel?.name)
+        setNavTitle(title: viewModel?.name)
     }
 
     func configure(searchDetailsViewModel: SearchedDetailsViewModel) {
-        self.searchDetailsViewModel = searchDetailsViewModel
+        viewModel = searchDetailsViewModel
     }
 
 }

@@ -4,10 +4,10 @@
 
 import UIKit
 
-struct AlertPopUp {
-    static func makePopUp(controller: UIViewController, error: Error) {
-        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertController.Style.alert)
+extension UIViewController {
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default, handler: nil))
-        controller.present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
     }
 }

@@ -27,7 +27,7 @@ final class WeatherViewController: UIViewController{
     private var location: CLLocation?
 
     private let locationManager = CLLocationManager()
-    private var weatherModel: WeatherViewModel?
+    private var weatherViewModel: WeatherViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +42,7 @@ final class WeatherViewController: UIViewController{
     }
 
     func configure(weatherModel: WeatherViewModel) {
-        self.weatherModel = weatherModel
+        self.weatherViewModel = weatherModel
     }
 
 }
@@ -58,7 +58,7 @@ private extension WeatherViewController {
     }
 
     @objc func searchTapped() {
-        weatherModel?.onSearchTapped?()
+        weatherViewModel?.onSearchTapped?()
     }
 
     func setupBackground() {
@@ -207,39 +207,35 @@ private extension WeatherViewController {
         }
     }
     @objc func didTapTableButton() {
-        weatherModel?.onTableButton?(location)
+        weatherViewModel?.onTableButton?(location)
     }
 }
 
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = manager.location
+        guard let location = manager.location else { return }
 
-        NetworkManager.getWeather(location: location) { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self, let location = self.location else { return }
-                if case .success(let weather) = result {
-                    let weather = weather.current
+        weatherViewModel?.getWeather(location: location, completion: { [weak self] result in
+            if case .success(let weather) = result {
+                let weather = weather.current
 
-                    let weatherVisibility = Double(weather.visibility) / 1000
+                let weatherVisibility = Double(weather.visibility) / 1000
 
-                    self.temperatureLabel.text = "\(String(format: "%.0f", weather.temp))°"
-                    self.skyConditionLabel.text = weather.weather[0].weatherDescription
-                    self.detailStackVisibilityValueLabel.text = "\(String(format: "%.1f", weatherVisibility))km"
-                    self.detailStackHumidityValueLabel.text = "\(String(weather.humidity))%"
-                    self.detailStackWindValueLabel.text = "\(String(weather.windSpeed))m/s"
+                self?.temperatureLabel.text = "\(String(format: "%.0f", weather.temp))°"
+                self?.skyConditionLabel.text = weather.weather[0].weatherDescription
+                self?.detailStackVisibilityValueLabel.text = "\(String(format: "%.1f", weatherVisibility))km"
+                self?.detailStackHumidityValueLabel.text = "\(String(weather.humidity))%"
+                self?.detailStackWindValueLabel.text = "\(String(weather.windSpeed))m/s"
 
-                    location.fetchCityAndCountry { city, country, error in
-                        guard let city = city, let _ = country, let error = error else { return }
-                        self.locationNameLabel.text = city
-                        AlertPopUp.makePopUp(controller: self, error: error)
-                    }
-                } else if case .failure(let error) = result {
-                    AlertPopUp.makePopUp(controller: self, error: error)
+                location.fetchCityAndCountry { city, country, error in
+                    guard let city = city, let _ = country, let error = error else { return }
+                    self?.locationNameLabel.text = city
+                    self?.showAlert(title: "Error", message: error.localizedDescription)
                 }
+            } else if case .failure(let error) = result {
+                self?.showAlert(title: "Error", message: error.localizedDescription)
             }
-            
-        }
+        })
 
     }
 }

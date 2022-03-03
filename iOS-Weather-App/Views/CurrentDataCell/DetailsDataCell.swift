@@ -32,6 +32,15 @@ class DetailsDataCell: UITableViewCell {
         setupWindLabel()
     }
 
+    func configure(weather: Weather.Daily) {
+        temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
+        dateLabel.text = weather.dt.convertToUsableDateString()
+        windLabel.attributedText = WindLabel.makeWindLabel(windSpeed: weather.windSpeed)
+        maxTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.max))°"
+        minTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.min))°"
+        selectionStyle = .none
+    }
+
 }
 
 private extension DetailsDataCell {

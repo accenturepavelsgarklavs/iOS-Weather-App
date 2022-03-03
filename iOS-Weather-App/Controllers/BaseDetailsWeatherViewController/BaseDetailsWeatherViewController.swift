@@ -60,23 +60,14 @@ extension BaseDetailsWeatherViewController: UITableViewDataSource {
               let location = location else {
             return .init()
         }
-
-        NetworkManager.getWeather(location: location) { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                if case .success(let weather) = result {
-                    let weather = weather.daily[indexPath.row]
-                    cell.selectionStyle = .none
-                    cell.temperatureLabel.text = "\(String(format: "%.0f", weather.temp.day))°"
-                    cell.dateLabel.text = weather.dt.convertToUsableDateString()
-                    cell.windLabel.attributedText = self.baseDetailsWeatherViewModel.makeWindLabelText(windSpeed: weather.windSpeed)
-                    cell.maxTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.max))°"
-                    cell.minTemperatureLabel.text = "\(String(format: "%.0f", weather.temp.min))°"
-                } else if case .failure(let error) = result {
-                    AlertPopUp.makePopUp(controller: self, error: error)
-                }
+        baseDetailsWeatherViewModel.getWeather(location: location, completion: { [weak self] result in
+            if case .success(let weather) = result {
+                let weather = weather.daily[indexPath.row]
+                cell.configure(weather: weather)
+            } else if case .failure(let error) = result {
+                self?.showAlert(title: "Error", message: error.localizedDescription)
             }
-        }
+        })
         return cell
     }
 }
